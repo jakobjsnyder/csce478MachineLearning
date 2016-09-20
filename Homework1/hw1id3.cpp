@@ -48,5 +48,17 @@ struct votes_t{
 
 int main()
 {
-  std::cout << "Hello World!";
+  //parse the data into the structs using an array
+
+  //split into training and testing data
+
+  //create disicsion tree using id3
+
+  //print out tree????
+
+  //test the tree using test array
+
+  //output error
+
+  std::cout << "Hello World!\n";
 }
