@@ -1,5 +1,7 @@
 #include <iostream>
+using namespace std;
 
+//no data = -1
 struct monks_t{
   int clas;
   int a1;
@@ -9,8 +11,10 @@ struct monks_t{
   int a5;
   int a6;
   int id;
+  int numClasses = 8;
 };
 
+//no data = -1
 struct poker_t{
   int clas;
   int s1;
@@ -23,10 +27,12 @@ struct poker_t{
   int c4;
   int s5;
   int c5;
+  int numClasses = 11;
 };
 
+//no data = -1
 struct votes_t{
-  int clas;
+  int clas; //dem=0 or repub=1 nah=-1
   int handicapp;
   int water;
   int adopt;
@@ -43,12 +49,35 @@ struct votes_t{
   int crime;
   int duty;
   int exportAdmin;
+  int numClasses = 17;
 };
 
+T[] parseData(int set){
+  return (int[]){0,1,2};
+}
 
-int main()
+int main(int argc, char* argv[])
 {
+  int dataSet = atoi(argv[1]);
   //parse the data into the structs using an array
+
+  T fullData[];
+
+  if (dataSet == 1 ){
+    fullData = parseData(1);
+    cout << fullData;
+  }
+  else if(dataSet == 2  ){
+    fullData = parseData(2);
+  }
+  else if(dataSet == 3){
+    fullData = parseData(3);
+  }
+  else{
+    return -1;
+  }
+
+
 
   //split into training and testing data
 
@@ -60,5 +89,5 @@ int main()
 
   //output error
 
-  std::cout << "Hello World!\n";
+  cout << "Hello World!\n";
 }
