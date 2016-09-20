@@ -52,8 +52,22 @@ struct votes_t{
   int numClasses = 17;
 };
 
-static T[] parseData(int set){
-  return (int[]){0,1,2};
+static monks_t[] parseMonks(){
+  int size = 12;//pass through data to find size
+  monks_t[size] fullData;
+  return fullData;
+}
+
+static votes_t[] parseVotes(){
+  int size = 12;//pass through data to find size
+  votes_t[size] fullData;
+  return fullData;
+}
+
+static poker_t[] parsePoker(){
+  int size = 12;//pass through data to find size
+  poker_t[size] fullData;
+  return fullData;
 }
 
 int main(int argc, char* argv[])
@@ -64,14 +78,14 @@ int main(int argc, char* argv[])
   T fullData[];
 
   if (dataSet == 1 ){
-    fullData = parseData(1);
+    fullData = parseMonks();
     cout << fullData;
   }
   else if(dataSet == 2  ){
-    fullData = parseData(2);
+    fullData = parseVotes();
   }
   else if(dataSet == 3){
-    fullData = parseData(3);
+    fullData = parsePoker();
   }
   else{
     return -1;
