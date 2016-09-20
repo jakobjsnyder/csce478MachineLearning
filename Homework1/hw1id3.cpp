@@ -9,7 +9,7 @@ struct monks_t{
   int a5;
   int a6;
   int id;
-}
+};
 
 struct poker_t{
   int clas;
@@ -23,7 +23,7 @@ struct poker_t{
   int c4;
   int s5;
   int c5;
-}
+};
 
 struct votes_t{
   int clas;
@@ -43,10 +43,10 @@ struct votes_t{
   int crime;
   int duty;
   int exportAdmin;
-}
+};
 
 
 int main()
 {
-  cout << "Hello World!";
+  std::cout << "Hello World!";
 }
