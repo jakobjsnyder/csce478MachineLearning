@@ -52,7 +52,7 @@ struct votes_t{
   int numClasses = 17;
 };
 
-T[] parseData(int set){
+static T[] parseData(int set){
   return (int[]){0,1,2};
 }
 
