@@ -135,6 +135,29 @@ namespace hw1id3
 
             //split into training and testing data
 
+            List<Element> trainingData = new List<Element>();
+            List<Element> testingData = new List<Element>();
+            List<int> trainingInts = new List<int>();
+            Random rnd = new Random();
+            for (int i = 0; i <= 30; i++)
+            {
+                trainingInts.Add(rnd.Next(fullData.Count));
+            }
+
+            for(int j = 0; j < fullData.Count; j++)
+            {
+                if (trainingInts.Contains(j))
+                {
+                    trainingData.Add(fullData[j]);
+                }
+                else
+                {
+                    testingData.Add(fullData[j]);
+                }
+            }
+
+            Console.WriteLine("suhhh");
+
             //create disicsion tree using id3
 
             //print out tree????
