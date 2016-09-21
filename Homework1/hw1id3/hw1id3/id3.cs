@@ -138,6 +138,9 @@ namespace hw1id3
             List<Element> trainingData = new List<Element>();
             List<Element> testingData = new List<Element>();
             List<int> trainingInts = new List<int>();
+
+            
+
             Random rnd = new Random();
             for (int i = 0; i <= 30; i++)
             {
@@ -160,12 +163,26 @@ namespace hw1id3
 
             //create disicsion tree using id3
 
+            TreeNode root = generateTree(trainingData);
+
             //print out tree????
 
             //test the tree using test array
 
             //output error
 
+        }
+
+        private static TreeNode generateTree(List<Element> trainingData)
+        {
+            List<int> availableAttributes = new List<int>();
+
+            for (int i = 0; i < trainingData.First().Attributes.Count; i++)
+                availableAttributes.Add(i);
+
+
+
+            throw new NotImplementedException();
         }
 
         private static List<Element> parseData(int selectData)
