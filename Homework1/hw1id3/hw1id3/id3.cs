@@ -207,7 +207,7 @@ namespace hw1id3
 
             foreach(Element e in trainingData)
             {
-                if (!APV.Contains(e.Attributes[splitIndex]))
+                if (!APV.Contains(e.Attributes[splitIndex]) && e.Attributes[splitIndex] != -1)
                 {
                     APV.Add(e.Attributes[splitIndex]);
                 }
@@ -228,11 +228,12 @@ namespace hw1id3
                 count++;
                 
             }
+            
             foreach(Element e in trainingData)
             {
                 e.Attributes[splitIndex] = -2;
             }
-
+            // 404 in training data yet there are 394 total in childData. this is an issue TODO
             foreach(var dataset in childData)
             {
                 node.children.Add(generateTree(dataset));
@@ -249,12 +250,13 @@ namespace hw1id3
             //}
             for (int x = 0; x < trainingData[0].Attributes.Count; x++)
             {
-                attributes.Add(x);
+                if(trainingData[0].Attributes[x] != -2)
+                    attributes.Add(x);
             }
 
             double MinEnt = 2;
-            int splitIndex = -1;
-
+            int splitIndex = -100;
+            // TODO make sure to fix this so split index is always set.
             foreach (int attribute in attributes)
             {
                 double thisEntropy = calculateEntropy(trainingData, attribute);
