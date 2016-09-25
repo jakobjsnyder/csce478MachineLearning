@@ -10,3 +10,9 @@ C:\Users\jsnyder20\Documents\Fall2016\MachineLearning\csce478MachineLearning\Hom
 C:\Users\jsnyder20\Documents\Fall2016\MachineLearning\csce478MachineLearning\Homework1\hw1id3\hw1id3\obj\Debug\hw1id3.csprojResolveAssemblyReference.cache
 C:\Users\jsnyder20\Documents\Fall2016\MachineLearning\csce478MachineLearning\Homework1\hw1id3\hw1id3\bin\Debug\hw1id3.exe
 C:\Users\jsnyder20\Documents\Fall2016\MachineLearning\csce478MachineLearning\Homework1\hw1id3\hw1id3\bin\Debug\hw1id3.pdb
+C:\Users\chenderson9\Documents\csce478MachineLearning\Homework1\hw1id3\hw1id3\bin\Debug\hw1id3.exe.config
+C:\Users\chenderson9\Documents\csce478MachineLearning\Homework1\hw1id3\hw1id3\obj\Debug\hw1id3.exe
+C:\Users\chenderson9\Documents\csce478MachineLearning\Homework1\hw1id3\hw1id3\obj\Debug\hw1id3.pdb
+C:\Users\chenderson9\Documents\csce478MachineLearning\Homework1\hw1id3\hw1id3\bin\Debug\hw1id3.exe
+C:\Users\chenderson9\Documents\csce478MachineLearning\Homework1\hw1id3\hw1id3\bin\Debug\hw1id3.pdb
+C:\Users\chenderson9\Documents\csce478MachineLearning\Homework1\hw1id3\hw1id3\obj\Debug\hw1id3.csprojResolveAssemblyReference.cache

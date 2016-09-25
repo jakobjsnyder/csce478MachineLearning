@@ -8,6 +8,9 @@ namespace hw1id3
 {
     class TreeNode
     {
+        public int attribute;
+        public int label;
 
+        public List<TreeNode> children;
     }
 }
