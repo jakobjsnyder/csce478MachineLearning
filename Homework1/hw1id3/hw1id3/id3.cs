@@ -151,11 +151,11 @@ namespace hw1id3
             {
                 if (trainingInts.Contains(j))
                 {
-                    trainingData.Add(fullData[j]);
+                    testingData.Add(fullData[j]);
                 }
                 else
                 {
-                    testingData.Add(fullData[j]);
+                    trainingData.Add(fullData[j]);
                 }
             }
 
@@ -177,12 +177,20 @@ namespace hw1id3
         {
             List<int> availableAttributes = new List<int>();
 
+            // this is created in order 
             for (int i = 0; i < trainingData.First().Attributes.Count; i++)
                 availableAttributes.Add(i);
 
 
+            
 
             throw new NotImplementedException();
+
+        }
+
+        private double log2(double x)
+        {
+            return Math.Log(x) / Math.Log(2);
         }
 
         private static List<Element> parseData(int selectData)
