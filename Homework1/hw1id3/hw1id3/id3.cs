@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
+// created by Jakob Snyder(jsnyde) and Clayton Henderson(chenders)
+
 namespace hw1id3
 {
     class id3
@@ -184,7 +186,7 @@ namespace hw1id3
 
 
 
-
+            Console.WriteLine("Press the space bar to exit.");
             Console.ReadKey();
 
         }

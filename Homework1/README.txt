@@ -1,1 +1,2 @@
 Read me for hw1
+In order to run this program simply go to \hw1id3\hw1id3\bin\debug\ and double click hw1id3.exe this will execute the program and you will be able to see our output. To see the code simply double click the solution file in \hw1id3\.
