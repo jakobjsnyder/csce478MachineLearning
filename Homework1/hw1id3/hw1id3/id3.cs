@@ -127,51 +127,108 @@ namespace hw1id3
             //parse the data
             //command line arg 1 = monks, 2 = voting, 3 = poker
             //int selectData = Convert.ToInt32(args[0]);
-            int selectData = 3;
+            List<int> all3 = new List<int>();
+            all3.Add(1);
+            all3.Add(2);
+            all3.Add(3);
 
-            List<Element> fullData = new List<Element>();
-
-            fullData = parseData(selectData);
-
-            //split into training and testing data
-
-            List<Element> trainingData = new List<Element>();
-            List<Element> testingData = new List<Element>();
-            List<int> trainingInts = new List<int>();
-
-
-
-            Random rnd = new Random();
-            for (int i = 0; i <= 30; i++)
+            foreach(int index in all3)
             {
-                trainingInts.Add(rnd.Next(fullData.Count));
+                List<Element> fullData = new List<Element>();
+
+                fullData = parseData(index);
+
+                //split into training and testing data
+
+                List<Element> trainingData = new List<Element>();
+                List<Element> testingData = new List<Element>();
+                List<int> trainingInts = new List<int>();
+
+
+
+                Random rnd = new Random();
+                for (int i = 0; i <= 30; i++)
+                {
+                    trainingInts.Add(rnd.Next(fullData.Count));
+                }
+
+                for (int j = 0; j < fullData.Count; j++)
+                {
+                    if (trainingInts.Contains(j))
+                    {
+                        testingData.Add(fullData[j]);
+                    }
+                    else
+                    {
+                        trainingData.Add(fullData[j]);
+                    }
+                }
+
+
+                //create disicsion tree using id3
+
+                TreeNode root = generateTree(trainingData);
+
+                //print out tree????
+                root.PrintNode("");
+
+                //test the tree using test array
+
+                testTree(root, testingData);
+                Console.WriteLine("");
+                Console.WriteLine("");
+                Console.WriteLine("");
+                Console.WriteLine("");
+                //output error
             }
 
-            for (int j = 0; j < fullData.Count; j++)
+
+
+
+            Console.ReadKey();
+
+        }
+
+        private static void testTree(TreeNode root, List<Element> testingData)
+        {
+            int error = 0;
+            
+            foreach(Element e in testingData)
             {
-                if (trainingInts.Contains(j))
+                TreeNode current = root;
+                
+                
+                while (current.Label == -50)
                 {
-                    testingData.Add(fullData[j]);
+                    List<int> APV = new List<int>();
+
+                    foreach (Element e2 in testingData)
+                    {
+                        if (!APV.Contains(e2.Attributes[current.Attribute]) && e2.Attributes[current.Attribute] != -1)
+                        {
+                            APV.Add(e2.Attributes[current.Attribute]);
+                        }
+                    }
+
+                    APV.Sort();
+                    int currentAttri = current.Attribute;
+                    int eAttri = e.Attributes[currentAttri];
+                    int indexOf = APV.IndexOf(eAttri);
+
+                    if(indexOf == -1)
+                    {
+                        error++;
+                        break;
+                    }
+
+                    current = current.Children[indexOf];
                 }
-                else
+                if(current.Label != e.Label)
                 {
-                    trainingData.Add(fullData[j]);
+                    error++;
                 }
             }
-
-            Console.WriteLine("suhhh");
-
-            //create disicsion tree using id3
-
-            TreeNode root = generateTree(trainingData);
-
-            //print out tree????
-            Console.WriteLine("dudeeee");
-
-            //test the tree using test array
-
-            //output error
-
+            Console.WriteLine("Error was {0}/30 or {1:0.000}", error, error/30.0);
         }
 
         private static TreeNode generateTree(List<Element> trainingData)
@@ -192,12 +249,12 @@ namespace hw1id3
             }
             if(count0 == trainingData.Count)
             {
-                node.label = 0;
+                node.Label = 0;
                 return node;
             }
             else if(count1 == trainingData.Count)
             {
-                node.label = 1;
+                node.Label = 1;
                 return node;
             }
 
@@ -214,6 +271,7 @@ namespace hw1id3
             }
             List<List<Element>> childData = new List<List<Element>>();
             int count =0;
+            APV.Sort();
             foreach(int i in APV)
             {
                 childData.Add(new List<Element>());
@@ -234,10 +292,10 @@ namespace hw1id3
                 e.Attributes[splitIndex] = -2;
             }
             // 404 in training data yet there are 394 total in childData. this is an issue TODO
-            node.attribute = splitIndex;
+            node.Attribute = splitIndex;
             foreach(var dataset in childData)
             {
-                node.children.Add(generateTree(dataset));
+                node.Children.Add(generateTree(dataset));
             }
             return node;
         }
