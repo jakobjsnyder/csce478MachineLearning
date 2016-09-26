@@ -11,6 +11,6 @@ namespace hw1id3
         public int attribute;
         public int label;
 
-        public List<TreeNode> children;
+        public List<TreeNode> children = new List<TreeNode>();
     }
 }

@@ -32,7 +32,7 @@ namespace hw1id3
                     }
                     else if (i == 7)
                     {
-                        attri.Add(Convert.ToInt32(item.Split('_')[1]));
+                        i++;
                     }
                     else
                     {
@@ -60,7 +60,7 @@ namespace hw1id3
                 List<int> attri = new List<int>();
                 line = line.Trim();
                 var split = line.Split(',');
-                clas = Convert.ToInt32(split.Last());
+                clas = (Convert.ToInt32(split.Last()) <= 4) ? 0 : 1;// we changed this to decent vs amazing hands because we could not implement non binary labels.
                 int i = 0;
                 foreach (var item in split)
                 {
@@ -127,7 +127,7 @@ namespace hw1id3
             //parse the data
             //command line arg 1 = monks, 2 = voting, 3 = poker
             //int selectData = Convert.ToInt32(args[0]);
-            int selectData = 2;
+            int selectData = 3;
 
             List<Element> fullData = new List<Element>();
 
@@ -234,6 +234,7 @@ namespace hw1id3
                 e.Attributes[splitIndex] = -2;
             }
             // 404 in training data yet there are 394 total in childData. this is an issue TODO
+            node.attribute = splitIndex;
             foreach(var dataset in childData)
             {
                 node.children.Add(generateTree(dataset));
@@ -327,12 +328,14 @@ namespace hw1id3
             double N_m = trainingData.Count;
             double N_mj = 0;        //num of attribute with specific value
             double Weight = 0;
+            double p0_mj;
+            double p1_mj;
 
             List<int> PossibleAttributeVals = new List<int>();
 
             foreach (Element e in trainingData)
             {
-                if (!PossibleAttributeVals.Contains(e.Attributes[attributeIndex]) && e.Attributes[attributeIndex] != -2)
+                if (!PossibleAttributeVals.Contains(e.Attributes[attributeIndex]) && e.Attributes[attributeIndex] >= 0)
                 {
                     PossibleAttributeVals.Add(e.Attributes[attributeIndex]);
                 }
@@ -362,11 +365,15 @@ namespace hw1id3
                 }
                 Weight = N_mj / N_m;
 
-                double p0_mj = N0_mj / N_mj;
-                double p1_mj = N1_mj / N_mj;
+                p0_mj = N0_mj / N_mj;
+                p1_mj = N1_mj / N_mj;
 
-                double entropySum = p0_mj * Math.Log(p0_mj, 2) + p1_mj * Math.Log(p1_mj, 2);
-                weightedEntropySum += -1 * (Weight * entropySum);
+                double p0Log = (p0_mj == 0) ? 0 : p0_mj * Math.Log(p0_mj, 2);
+                double p1Log = (p1_mj == 0) ? 0 : p1_mj * Math.Log(p1_mj, 2);
+
+                double entropySum = p0Log + p1Log;
+                double totalSum = -1 * Weight * entropySum;
+                weightedEntropySum += totalSum;
             }
             return weightedEntropySum;
         }
