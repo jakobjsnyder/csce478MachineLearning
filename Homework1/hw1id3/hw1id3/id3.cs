@@ -144,19 +144,19 @@ namespace hw1id3
 
                 List<Element> trainingData = new List<Element>();
                 List<Element> testingData = new List<Element>();
-                List<int> trainingInts = new List<int>();
+                List<int> testingInts = new List<int>();
 
 
 
                 Random rnd = new Random();
                 for (int i = 0; i <= 30; i++)
                 {
-                    trainingInts.Add(rnd.Next(fullData.Count));
+                    testingInts.Add(rnd.Next(fullData.Count));
                 }
 
                 for (int j = 0; j < fullData.Count; j++)
                 {
-                    if (trainingInts.Contains(j))
+                    if (testingInts.Contains(j))
                     {
                         testingData.Add(fullData[j]);
                     }
