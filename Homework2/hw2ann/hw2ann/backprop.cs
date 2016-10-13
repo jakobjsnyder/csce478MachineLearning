@@ -10,13 +10,14 @@ namespace hw2ann
     class Backprop
     {
         static double eta = 0.5;
-        static int maxPasses = 5000;
+        static int maxPasses = 1000;
         static double minErrorCondition = .0001;
         static int Passes = 0;
         static bool errorGucci = false;
         public static List<Neuron> InputLayer = new List<Neuron>();
         public static List<Neuron> HiddenLayer = new List<Neuron>();
         public static Neuron OutputNeuron = new Neuron();
+        public static Neuron BiasNeuron = new Neuron();
 
         public static void Main(string[] args)
         {
@@ -48,14 +49,19 @@ namespace hw2ann
             HiddenLayer = createHiddenLayer(2);
             OutputNeuron = new Neuron();
 
-            for(int i = 0; i < HiddenLayer.Count; i++)     //create network structure
+            #region Create Network
+            for (int i = 0; i < HiddenLayer.Count; i++)     //create network structure
             {
                 for(int j = 0; j < InputLayer.Count; j++)
                 {
                     HiddenLayer[i].addInConnection(InputLayer[j]);
                 }
                 OutputNeuron.addInConnection(HiddenLayer[i]);
+                HiddenLayer[i].addBiasConnection(BiasNeuron);
             }
+            OutputNeuron.addBiasConnection(BiasNeuron);
+            #endregion
+
 
             double errorSquared = 10.0;
             while( Passes < maxPasses && errorSquared > .0001)
@@ -77,47 +83,49 @@ namespace hw2ann
                     errorSquared += Math.Pow(((double)trial.Label - OutputNeuron.getOutputValue()), 2);
                     //Console.WriteLine("Training Error = " + ((double)trial.Label - OutputNeuron.getOutputValue()));
 
+                    #region Finding Deltas
                     //find the deltas
-                    double deltaWD = 0.0;
-                    List<double> deltaWCList = new List<double>();
-                    deltaWD = OutputNeuron.getOutputValue() * (trial.Label - OutputNeuron.getOutputValue());
-                    OutputNeuron.setDeltaWs(deltaWD);
-
-                    int counter = 0;
+                    double deltaWD = OutputNeuron.getOutputValue() * (trial.Label - OutputNeuron.getOutputValue()) * (OutputNeuron.getBias() - OutputNeuron.getOutputValue());
+                    OutputNeuron.setDeltaWeight(deltaWD);
 
                     // find deltas for each hidden neuron
-                    foreach (Neuron hiddenNeuron in HiddenLayer)
+                    for(int i = 0; i< HiddenLayer.Count; i++)
                     {
-                        double deltaWC = hiddenNeuron.getOutputValue() * (trial.Label - hiddenNeuron.getOutputValue()) * deltaWD * OutputNeuron.InConnections[counter].getWeight();
-                        HiddenLayer[counter].setDeltaWs(deltaWC);
-                        counter++;
+                        double deltaWC = HiddenLayer[i].getOutputValue() * (trial.Label - HiddenLayer[i].getOutputValue()) * deltaWD * OutputNeuron.InConnections[i].getWeight();
+                        HiddenLayer[i].setDeltaWeight(deltaWC);
                     }
 
-                    int outputCount = 0;
+                    #endregion
+
+
+                    #region Update Weights
                     double deltaW = 0.0;
                     double outputWeight = 0.0;
-                    foreach (Connection connection in OutputNeuron.InConnections)
+                    for(int j = 0; j < OutputNeuron.InConnections.Count; j++)
                     {
-                        deltaW = connection.DeltaWeight;
-                        outputWeight = connection.getWeight() + (eta * connection.LeftNeuron.getOutputValue() * deltaW);
-                        OutputNeuron.InConnections[outputCount].setWeight(outputWeight);
-                        outputCount++;
+                        deltaW = OutputNeuron.getDeltaWeight();
+                        outputWeight = OutputNeuron.InConnections[j].getWeight() + (eta * OutputNeuron.InConnections[j].LeftNeuron.getOutputValue() * deltaWD);
+                        OutputNeuron.InConnections[j].setWeight(outputWeight);
                     }
 
-                    int neuronCount = 0;
-                    foreach (Neuron hiddenNeuron in HiddenLayer)
+                    OutputNeuron.BiasConnection.setWeight(OutputNeuron.BiasConnection.getWeight() + (eta * deltaW));
+
+                    for(int k = 0; k < HiddenLayer.Count; k ++)
                     {
-                        int connectionCount = 0;
-                        foreach (Connection connection in hiddenNeuron.InConnections)
+                        for(int l = 0; l < HiddenLayer[k].InConnections.Count; l++)
                         {
-                            HiddenLayer[neuronCount].InConnections[connectionCount].setWeight(connection.getWeight() + (eta * connection.LeftNeuron.getOutputValue() * connection.DeltaWeight));
+                            HiddenLayer[k].InConnections[l].setWeight(HiddenLayer[k].InConnections[l].getWeight() + (eta * HiddenLayer[k].InConnections[l].LeftNeuron.getOutputValue() * HiddenLayer[k].getDeltaWeight()));
                             //Console.Write("w(" + neuronCount + ", " + connectionCount + ") = " + connection.getWeight() + " ");
-                            connectionCount++;
                         }
-                        //Console.Write("\n ");
-                        neuronCount++;
-                    }
 
+
+                        HiddenLayer[k].BiasConnection.setWeight(HiddenLayer[k].BiasConnection.getWeight() + (eta * HiddenLayer[k].getDeltaWeight()));
+                        //Console.Write("\n ");
+                    }
+                    #endregion
+
+
+                    #region error gucci
                     //errorGucci = true;
                     //foreach(Connection inConnection in OutputNeuron.InConnections)
                     //{
@@ -145,6 +153,7 @@ namespace hw2ann
                     //        }
                     //    }
                     //}
+                    #endregion
                 }
                 //Console.WriteLine("Passes = " + Passes);
                 Console.WriteLine("Error squared = "+ errorSquared);

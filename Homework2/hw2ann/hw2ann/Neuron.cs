@@ -10,6 +10,11 @@ namespace hw2ann
     {
         public double OutputValue;
         public List<Connection> InConnections = new List<Connection>();
+        public Connection BiasConnection;
+        public double DeltaWeight;
+        public double PreviousDeltaWeight;
+        public double DeltaDiff;
+        double BiasConst = 1.0;
 
         public Neuron(double initialOutputValue)
         {
@@ -41,6 +46,7 @@ namespace hw2ann
 
                 sum += weight * leftNeuronOutputValue;
             }
+            sum += BiasConnection.getWeight() * BiasConst;
 
 
             OutputValue = sigmoid(sum);
@@ -56,19 +62,38 @@ namespace hw2ann
             InConnections.Add(new Connection(inNeuron, this));
         }
 
-        
-
-
-
-        public void setDeltaWs(double deltaW)
+        public void addBiasConnection(Neuron neuron)
         {
+            Connection connection = new Connection(neuron, this);
+            BiasConnection = connection;
+            InConnections.Add(connection);
+        }
 
-            for (int i = 0; i < InConnections.Count; i++)
-            {
-                InConnections[i].PreviousDeltaWeight = InConnections[i].DeltaWeight;
-                InConnections[i].DeltaWeight = deltaW;
-                InConnections[i].DeltaDiff = InConnections[i].DeltaWeight - InConnections[i].PreviousDeltaWeight;
-            }
+        public double getBias()
+        {
+            return BiasConst;
+        }
+
+        public double getDeltaWeight()
+        {
+            return DeltaWeight;
+        }
+
+        public void setDeltaWeight(double deltaWeight)
+        {
+            PreviousDeltaWeight = DeltaWeight;
+            DeltaWeight = deltaWeight;
+            DeltaDiff = DeltaWeight - PreviousDeltaWeight;
+        }
+
+        public void setPreviousDeltaWeight(double previousDeltaWeight)
+        {
+            PreviousDeltaWeight = previousDeltaWeight;
+        }
+
+        public double getPreviousDeltaWeight()
+        {
+            return PreviousDeltaWeight;
         }
     }
 }

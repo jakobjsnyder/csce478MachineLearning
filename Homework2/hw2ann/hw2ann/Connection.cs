@@ -9,9 +9,6 @@ namespace hw2ann
     class Connection
     {
         public double Weight = .2;
-        public double DeltaWeight;
-        public double PreviousDeltaWeight;
-        public double DeltaDiff;
         public Neuron LeftNeuron;
         public Neuron RightNeuron;
         //private static int counter = 0;
@@ -28,26 +25,6 @@ namespace hw2ann
         public double getWeight()
         {
             return Weight;
-        }
-
-        public double getDeltaWeight()
-        {
-            return DeltaWeight;
-        }
-
-        public void setDeltaWeight(double deltaWeight)
-        {
-            DeltaWeight = deltaWeight;
-        }
-
-        public void setPreviousDeltaWeight(double previousDeltaWeight)
-        {
-            PreviousDeltaWeight = previousDeltaWeight;
-        }
-
-        public double getPreviousDeltaWeight()
-        {
-            return PreviousDeltaWeight;
         }
 
         public void setWeight(double weight)
