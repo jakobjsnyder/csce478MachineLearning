@@ -8,8 +8,8 @@ namespace hw2ann
 {
     class Neuron
     {
-        double OutputValue;
-        List<Connection> InConnections = new List<Connection>();
+        public double OutputValue;
+        public List<Connection> InConnections = new List<Connection>();
 
         public Neuron(double initialOutputValue)
         {
@@ -47,7 +47,7 @@ namespace hw2ann
 
         private static double sigmoid(double sum)
         {
-            return 1 / (1 + Math.Pow(Math.E, -sum));
+            return 1.0 / (1.0 + Math.Pow(Math.E, -sum));
         }
 
         public void addInConnection(Neuron inNeuron)
@@ -60,6 +60,16 @@ namespace hw2ann
             foreach(Neuron neuron in inNeurons)
             {
                 InConnections.Add(new Connection(neuron, this));
+            }
+        }
+
+        internal void setDeltaWs(double deltaW)
+        {
+            foreach(Connection connection in InConnections)
+            {
+                connection.PreviousDeltaWeight = connection.DeltaWeight;
+                connection.DeltaWeight = deltaW;
+                connection.DeltaDiff = connection.DeltaWeight - connection.PreviousDeltaWeight;
             }
         }
     }

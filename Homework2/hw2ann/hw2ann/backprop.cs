@@ -10,6 +10,13 @@ namespace hw2ann
     class Backprop
     {
         static double eta = 0.1;
+        static int maxPasses = 5000;
+        static double minErrorCondition = .0001;
+        static int Passes = 0;
+        static bool errorGucci = false;
+        public static List<Neuron> InputLayer = new List<Neuron>();
+        public static List<Neuron> HiddenLayer = new List<Neuron>();
+        public static Neuron OutputNeuron = new Neuron();
 
         public static void Main(string[] args)
         {
@@ -37,9 +44,9 @@ namespace hw2ann
                 }
             }
             #endregion
-            List<Neuron> InputLayer = createInputLayer(2);
-            List<Neuron> HiddenLayer = createHiddenLayer(2);
-            Neuron OutputNeuron = new Neuron();
+            InputLayer = createInputLayer(2);
+            HiddenLayer = createHiddenLayer(2);
+            OutputNeuron = new Neuron();
 
             foreach(Neuron HiddenNeuron in HiddenLayer)     //create network structure
             {
@@ -49,18 +56,190 @@ namespace hw2ann
                 }
                 OutputNeuron.addInConnection(HiddenNeuron);
             }
-            int maxPasses = 20000;
-            double minErrorCondition = .00001;
-            int Passes = 0;
-            int Error = 1000;
 
-            while(Error>minErrorCondition && Passes < maxPasses)
+            double errorSquared = 10.0;
+            while(!errorGucci && Passes < maxPasses && errorSquared > .0001)
             {
+                 errorSquared = 0.0;
+                //set the values of the input neurons based on the attribute values
+                foreach (Element trial in trainingData)
+                {
+                    setInputNeuronValues(trial, dataSelector);
+
+                    //set the hidden layer values based on the weights of connections and the value of the input nodes that go into it.
+                    for(int i = 0; i < HiddenLayer.Count; i++)
+                    {
+                        HiddenLayer[i].calculateOutputValue();
+                    }
+
+                    OutputNeuron.calculateOutputValue();
+
+
+                    errorSquared += Math.Pow(((double)trial.Label - OutputNeuron.getOutputValue()), 2);
+                    //Console.WriteLine("Training Error = " + ((double)trial.Label - OutputNeuron.getOutputValue()));
+
+                    //find the deltas
+                    double deltaWD = 0.0;
+                    List<double> deltaWCList = new List<double>();
+                    deltaWD = OutputNeuron.getOutputValue() * (trial.Label - OutputNeuron.getOutputValue());
+                    OutputNeuron.setDeltaWs(deltaWD);
+
+                    int counter = 0;
+
+                    // find deltas for each hidden neuron
+                    foreach(Neuron hiddenNeuron in HiddenLayer)
+                    {
+                        double deltaWC = hiddenNeuron.getOutputValue() * (trial.Label - hiddenNeuron.getOutputValue()) * deltaWD * OutputNeuron.InConnections[counter].getWeight();
+                        HiddenLayer[counter].setDeltaWs(deltaWC);
+                        counter++;
+                    }
+
+
+
+                    int outputCount = 0;
+                    double deltaW = 0.0;
+                    double outputWeight = 0.0;
+                    foreach(Connection connection in OutputNeuron.InConnections)
+                    {
+                        deltaW = connection.DeltaWeight;
+                        outputWeight = connection.getWeight() + (eta * connection.LeftNeuron.getOutputValue() * deltaW);
+                        OutputNeuron.InConnections[outputCount].setWeight(outputWeight);
+                        outputCount++;
+                    }
+
+                    int neuronCount = 0;
+                    foreach(Neuron hiddenNeuron in HiddenLayer)
+                    {
+                        int connectionCount = 0;
+                        foreach(Connection connection in hiddenNeuron.InConnections)
+                        {
+                            HiddenLayer[neuronCount].InConnections[connectionCount].setWeight(connection.getWeight() + (eta * connection.LeftNeuron.getOutputValue() * connection.DeltaWeight));
+                            //Console.Write("w(" + neuronCount + ", " + connectionCount + ") = " + connection.getWeight() + " ");
+                            connectionCount++;
+                        }
+                        //Console.Write("\n ");
+                        neuronCount++;
+                    }
+
+                    errorGucci = true;
+                    foreach(Connection inConnection in OutputNeuron.InConnections)
+                    {
+                        if(inConnection.DeltaDiff > minErrorCondition)
+                        {
+                            errorGucci = false;
+                            break;
+                        }
+                    }
+
+                    if (errorGucci) { 
+                        foreach(Neuron n in HiddenLayer)
+                        {
+                            if (errorGucci)
+                            {
+                                foreach (Connection c in n.InConnections)
+                                {
+                                    if (c.DeltaDiff > minErrorCondition)
+                                    {
+                                        errorGucci = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Console.WriteLine("Passes = " + Passes);
+                Console.WriteLine("Error squared = "+ errorSquared);
+                Passes++;
             }
 
+            printWeights();
 
+
+            int errors = 0;
+            foreach(Element test in testingData)
+            {
+                setInputNeuronValues(test, 2);
+                //set the hidden layer values based on the weights of connections and the value of the input nodes that go into it.
+                for (int i = 0; i < HiddenLayer.Count; i++)
+                {
+                    HiddenLayer[i].calculateOutputValue();
+                }
+
+                OutputNeuron.calculateOutputValue();
+                int expectedLabel = test.Label;
+                int outputLabel = (OutputNeuron.getOutputValue() > .5) ? 1 : 0;
+                Console.WriteLine("Actual output = " + OutputNeuron.getOutputValue());
+                if(expectedLabel != outputLabel)
+                {
+                    errors++;
+                }
+            }
+            Console.WriteLine("Errors = " + errors);
 
             Console.ReadKey();
+        }
+
+        private static void printWeights()
+        {
+            StringBuilder sb = new StringBuilder();
+            int neuronCount = 0;
+            Console.WriteLine("HiddenLayer Weights");
+            foreach(Neuron hiddenN in HiddenLayer)
+            {
+                int connectionCount1 = 0;
+                foreach(Connection c in hiddenN.InConnections)
+                {
+                    Console.Write("w(" + neuronCount + ", " + connectionCount1 + ") = " + c.getWeight() + " ");
+                    connectionCount1++;
+                }
+                Console.Write("\n");
+
+                neuronCount++;
+            }
+            Console.WriteLine("OutputLayer Weights");
+
+            int connectionCount = 0;
+            foreach (Connection c in OutputNeuron.InConnections)
+            {
+                Console.Write("w(" + neuronCount + ", " + connectionCount + ") = " + c.getWeight() + " ");
+                connectionCount++;
+            }
+        }
+
+        private static void setInputNeuronValues(Element trial, int dataSelector)
+        {
+            if(dataSelector == 2)
+            {
+                setVoteInputNeuronValues(trial);
+            }
+            
+        }
+
+        private static void setVoteInputNeuronValues(Element trial)
+        {
+            int counter = 0;
+            foreach(int attribute in trial.Attributes)
+            {
+                if (attribute == 0)
+                {
+                    InputLayer[counter].setOutputValue(0);
+                    InputLayer[counter + 1].setOutputValue(0);
+                    counter += 2;
+                }
+                else if(attribute == 1)
+                {
+                    InputLayer[counter].setOutputValue(1);
+                    InputLayer[counter + 1].setOutputValue(0);
+                    counter += 2;
+                }
+                else if (attribute == 2)
+                {
+                    InputLayer[counter].setOutputValue(0);
+                    InputLayer[counter + 1].setOutputValue(1);
+                    counter += 2;
+                }
+            }
         }
 
         private static int roundOutput(double squasherOut)

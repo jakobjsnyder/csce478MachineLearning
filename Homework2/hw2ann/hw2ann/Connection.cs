@@ -11,6 +11,7 @@ namespace hw2ann
         public double Weight = .2;
         public double DeltaWeight;
         public double PreviousDeltaWeight;
+        public double DeltaDiff;
         public Neuron LeftNeuron;
         public Neuron RightNeuron;
         //private static int counter = 0;
