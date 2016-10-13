@@ -42,12 +42,13 @@ namespace hw2ann
                 sum += weight * leftNeuronOutputValue;
             }
 
+
             OutputValue = sigmoid(sum);
         }
 
         private static double sigmoid(double sum)
         {
-            return 1.0 / (1.0 + Math.Pow(Math.E, -sum));
+            return 1.0 / (1.0 + Math.Exp(-sum));
         }
 
         public void addInConnection(Neuron inNeuron)
@@ -55,21 +56,18 @@ namespace hw2ann
             InConnections.Add(new Connection(inNeuron, this));
         }
 
-        public void addInConnections(List<Neuron> inNeurons)
-        {
-            foreach(Neuron neuron in inNeurons)
-            {
-                InConnections.Add(new Connection(neuron, this));
-            }
-        }
+        
 
-        internal void setDeltaWs(double deltaW)
+
+
+        public void setDeltaWs(double deltaW)
         {
-            foreach(Connection connection in InConnections)
+
+            for (int i = 0; i < InConnections.Count; i++)
             {
-                connection.PreviousDeltaWeight = connection.DeltaWeight;
-                connection.DeltaWeight = deltaW;
-                connection.DeltaDiff = connection.DeltaWeight - connection.PreviousDeltaWeight;
+                InConnections[i].PreviousDeltaWeight = InConnections[i].DeltaWeight;
+                InConnections[i].DeltaWeight = deltaW;
+                InConnections[i].DeltaDiff = InConnections[i].DeltaWeight - InConnections[i].PreviousDeltaWeight;
             }
         }
     }

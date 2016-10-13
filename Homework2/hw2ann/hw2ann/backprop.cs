@@ -9,7 +9,7 @@ namespace hw2ann
 {
     class Backprop
     {
-        static double eta = 0.1;
+        static double eta = 0.5;
         static int maxPasses = 5000;
         static double minErrorCondition = .0001;
         static int Passes = 0;
@@ -48,17 +48,17 @@ namespace hw2ann
             HiddenLayer = createHiddenLayer(2);
             OutputNeuron = new Neuron();
 
-            foreach(Neuron HiddenNeuron in HiddenLayer)     //create network structure
+            for(int i = 0; i < HiddenLayer.Count; i++)     //create network structure
             {
-                foreach(Neuron InputNeuron in InputLayer)
+                for(int j = 0; j < InputLayer.Count; j++)
                 {
-                    HiddenNeuron.addInConnection(InputNeuron);
+                    HiddenLayer[i].addInConnection(InputLayer[j]);
                 }
-                OutputNeuron.addInConnection(HiddenNeuron);
+                OutputNeuron.addInConnection(HiddenLayer[i]);
             }
 
             double errorSquared = 10.0;
-            while(!errorGucci && Passes < maxPasses && errorSquared > .0001)
+            while( Passes < maxPasses && errorSquared > .0001)
             {
                  errorSquared = 0.0;
                 //set the values of the input neurons based on the attribute values
@@ -67,13 +67,12 @@ namespace hw2ann
                     setInputNeuronValues(trial, dataSelector);
 
                     //set the hidden layer values based on the weights of connections and the value of the input nodes that go into it.
-                    for(int i = 0; i < HiddenLayer.Count; i++)
+                    for (int i = 0; i < HiddenLayer.Count; i++)
                     {
                         HiddenLayer[i].calculateOutputValue();
                     }
 
                     OutputNeuron.calculateOutputValue();
-
 
                     errorSquared += Math.Pow(((double)trial.Label - OutputNeuron.getOutputValue()), 2);
                     //Console.WriteLine("Training Error = " + ((double)trial.Label - OutputNeuron.getOutputValue()));
@@ -87,19 +86,17 @@ namespace hw2ann
                     int counter = 0;
 
                     // find deltas for each hidden neuron
-                    foreach(Neuron hiddenNeuron in HiddenLayer)
+                    foreach (Neuron hiddenNeuron in HiddenLayer)
                     {
                         double deltaWC = hiddenNeuron.getOutputValue() * (trial.Label - hiddenNeuron.getOutputValue()) * deltaWD * OutputNeuron.InConnections[counter].getWeight();
                         HiddenLayer[counter].setDeltaWs(deltaWC);
                         counter++;
                     }
 
-
-
                     int outputCount = 0;
                     double deltaW = 0.0;
                     double outputWeight = 0.0;
-                    foreach(Connection connection in OutputNeuron.InConnections)
+                    foreach (Connection connection in OutputNeuron.InConnections)
                     {
                         deltaW = connection.DeltaWeight;
                         outputWeight = connection.getWeight() + (eta * connection.LeftNeuron.getOutputValue() * deltaW);
@@ -108,10 +105,10 @@ namespace hw2ann
                     }
 
                     int neuronCount = 0;
-                    foreach(Neuron hiddenNeuron in HiddenLayer)
+                    foreach (Neuron hiddenNeuron in HiddenLayer)
                     {
                         int connectionCount = 0;
-                        foreach(Connection connection in hiddenNeuron.InConnections)
+                        foreach (Connection connection in hiddenNeuron.InConnections)
                         {
                             HiddenLayer[neuronCount].InConnections[connectionCount].setWeight(connection.getWeight() + (eta * connection.LeftNeuron.getOutputValue() * connection.DeltaWeight));
                             //Console.Write("w(" + neuronCount + ", " + connectionCount + ") = " + connection.getWeight() + " ");
@@ -121,34 +118,35 @@ namespace hw2ann
                         neuronCount++;
                     }
 
-                    errorGucci = true;
-                    foreach(Connection inConnection in OutputNeuron.InConnections)
-                    {
-                        if(inConnection.DeltaDiff > minErrorCondition)
-                        {
-                            errorGucci = false;
-                            break;
-                        }
-                    }
+                    //errorGucci = true;
+                    //foreach(Connection inConnection in OutputNeuron.InConnections)
+                    //{
+                    //    if(inConnection.DeltaDiff > minErrorCondition)
+                    //    {
+                    //        errorGucci = false;
+                    //        break;
+                    //    }
+                    //}
 
-                    if (errorGucci) { 
-                        foreach(Neuron n in HiddenLayer)
-                        {
-                            if (errorGucci)
-                            {
-                                foreach (Connection c in n.InConnections)
-                                {
-                                    if (c.DeltaDiff > minErrorCondition)
-                                    {
-                                        errorGucci = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    //    if (errorGucci) { 
+                    //        foreach(Neuron n in HiddenLayer)
+                    //        {
+                    //            if (errorGucci)
+                    //            {
+                    //                foreach (Connection c in n.InConnections)
+                    //                {
+                    //                    if (c.DeltaDiff > minErrorCondition)
+                    //                    {
+                    //                        errorGucci = false;
+                    //                        break;
+                    //                    }
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 }
-                Console.WriteLine("Passes = " + Passes);
+                //Console.WriteLine("Passes = " + Passes);
                 Console.WriteLine("Error squared = "+ errorSquared);
                 Passes++;
             }
@@ -176,7 +174,6 @@ namespace hw2ann
                 }
             }
             Console.WriteLine("Errors = " + errors);
-
             Console.ReadKey();
         }
 
@@ -241,22 +238,7 @@ namespace hw2ann
                 }
             }
         }
-
-        private static int roundOutput(double squasherOut)
-        {
-            return (squasherOut > .5) ? 1 : 0;
-        }
-
-        private static double squasher(double sum)
-        {
-            return 1 / (1 + Math.Pow(Math.E, -sum));
-        }
-
-        private static double wTplus1(double wT, double r, double y, double x)
-        {
-            double delta = (r - y) * y * (1 - y) * x;
-            return wT + eta * delta * x;
-        }
+       
         private static List<Neuron> createInputLayer(int dataSelector)
         {
             if (dataSelector == 2)
@@ -290,7 +272,7 @@ namespace hw2ann
         private static List<Neuron> createVotingHiddenLayer()
         {
             List<Neuron> HiddenLayer = new List<Neuron>();
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 8; i++)
             {
                 HiddenLayer.Add(new Neuron());
             }
