@@ -114,7 +114,7 @@ namespace hw2ann
                                 attri.Add(1);
                                 break;
                             default:
-                                attri.Add(-1);
+                                attri.Add(2);
                                 break;
                         }
                     }

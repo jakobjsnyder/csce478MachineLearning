@@ -14,7 +14,8 @@ namespace hw2ann
         public static void Main(string[] args)
         {
             #region Parse Voting
-            List<Element> fullVoting = Parser.parseData(2);
+            int dataSelector = 2;
+            List<Element> fullVoting = Parser.parseData(dataSelector);
             //split into training and testing data
             List<Element> trainingData = new List<Element>();
             List<Element> testingData = new List<Element>();
@@ -36,7 +37,26 @@ namespace hw2ann
                 }
             }
             #endregion
+            List<Neuron> InputLayer = createInputLayer(2);
+            List<Neuron> HiddenLayer = createHiddenLayer(2);
+            Neuron OutputNeuron = new Neuron();
 
+            foreach(Neuron HiddenNeuron in HiddenLayer)     //create network structure
+            {
+                foreach(Neuron InputNeuron in InputLayer)
+                {
+                    HiddenNeuron.addInConnection(InputNeuron);
+                }
+                OutputNeuron.addInConnection(HiddenNeuron);
+            }
+            int maxPasses = 20000;
+            double minErrorCondition = .00001;
+            int Passes = 0;
+            int Error = 1000;
+
+            while(Error>minErrorCondition && Passes < maxPasses)
+            {
+            }
 
 
 
@@ -57,6 +77,45 @@ namespace hw2ann
         {
             double delta = (r - y) * y * (1 - y) * x;
             return wT + eta * delta * x;
+        }
+        private static List<Neuron> createInputLayer(int dataSelector)
+        {
+            if (dataSelector == 2)
+            {
+                return createVotingInputLayer();
+
+            }
+            else
+                return null;
+        }
+        private static List<Neuron> createVotingInputLayer()
+        {
+            List<Neuron> InLayer = new List<Neuron>();
+            for(int i = 0; i<16; i++)
+            {
+                InLayer.Add(new Neuron());
+                InLayer.Add(new Neuron());      //two neurons for every input attribute
+            }
+            return InLayer;
+        }
+        private static List<Neuron> createHiddenLayer(int dataSelector)
+        {
+            if (dataSelector == 2)
+            {
+                return createVotingHiddenLayer();
+
+            }
+            else
+                return null;
+        }
+        private static List<Neuron> createVotingHiddenLayer()
+        {
+            List<Neuron> HiddenLayer = new List<Neuron>();
+            for (int i = 0; i < 16; i++)
+            {
+                HiddenLayer.Add(new Neuron());
+            }
+            return HiddenLayer;
         }
 
     }

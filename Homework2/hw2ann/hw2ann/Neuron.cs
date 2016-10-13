@@ -15,6 +15,10 @@ namespace hw2ann
         {
             OutputValue = initialOutputValue;
         }
+        public Neuron()
+        {
+
+        }
 
         public double getOutputValue()
         {
