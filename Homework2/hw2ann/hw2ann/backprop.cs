@@ -10,7 +10,7 @@ namespace hw2ann
     class Backprop
     {
         static double eta = 0.5;
-        static int maxPasses = 1000;
+        static int maxPasses = 3000;
         static double minErrorCondition = .0001;
         static int Passes = 0;
         static bool errorGucci = false;
@@ -84,14 +84,16 @@ namespace hw2ann
                     //Console.WriteLine("Training Error = " + ((double)trial.Label - OutputNeuron.getOutputValue()));
 
                     #region Finding Deltas
-                    //find the deltas
-                    double deltaWD = OutputNeuron.getOutputValue() * (trial.Label - OutputNeuron.getOutputValue()) * (OutputNeuron.getBias() - OutputNeuron.getOutputValue());
+                    //find the deltas       //TODO getBias should always be 1
+                    double deltaWD = OutputNeuron.getOutputValue() * (trial.Label - OutputNeuron.getOutputValue()) * (1 - OutputNeuron.getOutputValue());
                     OutputNeuron.setDeltaWeight(deltaWD);
 
                     // find deltas for each hidden neuron
                     for(int i = 0; i< HiddenLayer.Count; i++)
                     {
-                        double deltaWC = HiddenLayer[i].getOutputValue() * (trial.Label - HiddenLayer[i].getOutputValue()) * deltaWD * OutputNeuron.InConnections[i].getWeight();
+                        //double deltaWC = HiddenLayer[i].getOutputValue() * (trial.Label - HiddenLayer[i].getOutputValue()) * deltaWD * OutputNeuron.InConnections[i].getWeight();
+                        double deltaWC = HiddenLayer[i].getOutputValue() * (1-HiddenLayer[i].getOutputValue())*deltaWD;
+
                         HiddenLayer[i].setDeltaWeight(deltaWC);
                     }
 
