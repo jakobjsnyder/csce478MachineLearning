@@ -9,8 +9,8 @@ namespace hw2ann
 {
     class Backprop
     {
-        static double eta = 0.5;
-        static int maxPasses = 3000;
+        static double eta = 0.2;
+        static int maxPasses = 400000;
         static double minErrorCondition = .0001;
         static int Passes = 0;
         static bool errorGucci = false;
@@ -18,32 +18,55 @@ namespace hw2ann
         public static List<Neuron> HiddenLayer = new List<Neuron>();
         public static Neuron OutputNeuron = new Neuron();
         public static Neuron BiasNeuron = new Neuron();
-
+    
         public static void Main(string[] args)
         {
-            #region Parse Voting
-            int dataSelector = 2;
-            List<Element> fullVoting = Parser.parseData(dataSelector);
+            #region Parse 
+            int dataSelector = 1;
+            List<Element> fullData = Parser.parseData(dataSelector);
             //split into training and testing data
             List<Element> trainingData = new List<Element>();
             List<Element> testingData = new List<Element>();
             List<int> testingInts = new List<int>();
+            List<int> pokerTraining = new List<int>();
             Random rnd = new Random();
             for (int i = 0; i <= 30; i++)
             {
-                testingInts.Add(rnd.Next(fullVoting.Count));
+                testingInts.Add(rnd.Next(fullData.Count));
             }
-            for (int j = 0; j < fullVoting.Count; j++)
+            if(dataSelector == 3)
             {
-                if (testingInts.Contains(j))
+                for(int i = 0; i <= 700; i++)
                 {
-                    testingData.Add(fullVoting[j]);
+                    pokerTraining.Add(rnd.Next(fullData.Count));
                 }
-                else
+                for (int j = 0; j < fullData.Count; j++)
                 {
-                    trainingData.Add(fullVoting[j]);
+                    if (testingInts.Contains(j))
+                    {
+                        testingData.Add(fullData[j]);
+                    }
+                    else if(pokerTraining.Contains(j))
+                    {
+                        trainingData.Add(fullData[j]);
+                    }
                 }
             }
+            else
+            {
+                for (int j = 0; j < fullData.Count; j++)
+                {
+                    if (testingInts.Contains(j))
+                    {
+                        testingData.Add(fullData[j]);
+                    }
+                    else
+                    {
+                        trainingData.Add(fullData[j]);
+                    }
+                }
+            }
+            
             #endregion
             InputLayer = createInputLayer(2);
             HiddenLayer = createHiddenLayer(2);
@@ -160,6 +183,12 @@ namespace hw2ann
                 //Console.WriteLine("Passes = " + Passes);
                 Console.WriteLine("Error squared = "+ errorSquared);
                 Passes++;
+
+                if (Passes == maxPasses)
+                    Console.WriteLine("max passes");
+                else if (errorSquared < minErrorCondition)
+                    Console.WriteLine("error square good");
+
             }
 
             printWeights();
@@ -217,11 +246,299 @@ namespace hw2ann
 
         private static void setInputNeuronValues(Element trial, int dataSelector)
         {
-            if(dataSelector == 2)
+            if(dataSelector == 1)
+            {
+                setMonksInputNeuronValues(trial);
+            }
+            else if(dataSelector == 2)
             {
                 setVoteInputNeuronValues(trial);
             }
+            else if(dataSelector == 3)
+            {
+                setPokerInputNeuronValues(trial);
+            }
             
+        }
+
+        private static void setPokerInputNeuronValues(Element trial)
+        {
+            int attributeCount = 0;
+            int neuronCount = 0;
+            foreach(int attribueValue in trial.Attributes)
+            {
+                if(attributeCount % 2 == 0)
+                {
+                    if(attribueValue == 1)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 2)
+                    {
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 3)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 4)
+                    {
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                    }
+                }
+                else
+                {
+                    if (attribueValue == 1)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 2)
+                    {
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 3)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 4)
+                    {
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 5)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 6)
+                    {
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 7)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 8)
+                    {
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 9)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 10)
+                    {
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 11)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 12)
+                    {
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                    }
+                    else if (attribueValue == 13)
+                    {
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(0);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                        InputLayer[neuronCount].setOutputValue(1);
+                        neuronCount++;
+                    }
+                }
+                attributeCount++;
+            }
+        }
+
+        private static void setMonksInputNeuronValues(Element trial)
+        {
+            if(trial.Attributes[0] == 1)
+            {
+                InputLayer[0].setOutputValue(0);
+                InputLayer[1].setOutputValue(0);
+            }
+            else if (trial.Attributes[0] == 2)
+            {
+                InputLayer[0].setOutputValue(1);
+                InputLayer[1].setOutputValue(0);
+            }
+            else if (trial.Attributes[0] == 3)
+            {
+                InputLayer[0].setOutputValue(0);
+                InputLayer[1].setOutputValue(1);
+            }
+
+            if (trial.Attributes[1] == 1)
+            {
+                InputLayer[2].setOutputValue(0);
+                InputLayer[3].setOutputValue(0);
+            }
+            else if (trial.Attributes[1] == 2)
+            {
+                InputLayer[2].setOutputValue(1);
+                InputLayer[3].setOutputValue(0);
+            }
+            else if (trial.Attributes[1] == 3)
+            {
+                InputLayer[2].setOutputValue(0);
+                InputLayer[3].setOutputValue(1);
+            }
+
+            if (trial.Attributes[2] == 1)
+            {
+                InputLayer[4].setOutputValue(0);
+            }
+            else if (trial.Attributes[2] == 2)
+            {
+                InputLayer[4].setOutputValue(1);
+            }
+
+            if (trial.Attributes[3] == 1)
+            {
+                InputLayer[5].setOutputValue(0);
+                InputLayer[6].setOutputValue(0);
+            }
+            else if (trial.Attributes[3] == 2)
+            {
+                InputLayer[5].setOutputValue(1);
+                InputLayer[6].setOutputValue(0);
+            }
+            else if (trial.Attributes[3] == 3)
+            {
+                InputLayer[5].setOutputValue(0);
+                InputLayer[6].setOutputValue(1);
+            }
+
+
+            if (trial.Attributes[4] == 1)
+            {
+                InputLayer[7].setOutputValue(0);
+                InputLayer[8].setOutputValue(0);
+            }
+            else if (trial.Attributes[4] == 2)
+            {
+                InputLayer[7].setOutputValue(1);
+                InputLayer[8].setOutputValue(0);
+            }
+            else if (trial.Attributes[4] == 3)
+            {
+                InputLayer[7].setOutputValue(0);
+                InputLayer[8].setOutputValue(1);
+            }
+            else if (trial.Attributes[4] == 3)
+            {
+                InputLayer[7].setOutputValue(1);
+                InputLayer[8].setOutputValue(1);
+            }
+
+            if (trial.Attributes[5] == 1)
+            {
+                InputLayer[9].setOutputValue(0);
+            }
+            else if (trial.Attributes[5] == 2)
+            {
+                InputLayer[9].setOutputValue(1);
+            }
+
+
         }
 
         private static void setVoteInputNeuronValues(Element trial)
@@ -252,14 +569,55 @@ namespace hw2ann
        
         private static List<Neuron> createInputLayer(int dataSelector)
         {
-            if (dataSelector == 2)
+            if (dataSelector == 1)
+            {
+                return createMonksInputLayer();
+            }
+            else if (dataSelector == 2)
             {
                 return createVotingInputLayer();
-
+            }
+            else if (dataSelector == 3)
+            {
+                return createPokerInputLayer();
             }
             else
                 return null;
         }
+
+        private static List<Neuron> createPokerInputLayer()
+        {
+            List<Neuron> InLayer = new List<Neuron>();
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    InLayer.Add(new Neuron());
+                }
+                for (int k = 0; k < 4; k++)
+                {
+                    InLayer.Add(new Neuron());
+                }
+            }
+            return InLayer;
+        }
+
+        private static List<Neuron> createMonksInputLayer()
+        {
+            List<Neuron> inlayer = new List<Neuron>();
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            return inlayer;
+        }
+
         private static List<Neuron> createVotingInputLayer()
         {
             List<Neuron> InLayer = new List<Neuron>();
@@ -272,14 +630,41 @@ namespace hw2ann
         }
         private static List<Neuron> createHiddenLayer(int dataSelector)
         {
-            if (dataSelector == 2)
+            if(dataSelector == 1)
+            {
+                return createMonkHiddenLayer();
+            }
+            else if (dataSelector == 2)
             {
                 return createVotingHiddenLayer();
-
+            }
+            else if(dataSelector == 3)
+            {
+                return createPokerHiddenLayer();
             }
             else
                 return null;
         }
+
+        private static List<Neuron> createPokerHiddenLayer()
+        {
+            List<Neuron> InLayer = new List<Neuron>();
+            for(int i = 0; i < 5; i++)
+            {
+                InLayer.Add(new Neuron());
+            }
+            return InLayer;
+        }
+
+        private static List<Neuron> createMonkHiddenLayer()
+        {
+            List<Neuron> inlayer = new List<Neuron>();
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            inlayer.Add(new Neuron());
+            return inlayer;
+        }
+
         private static List<Neuron> createVotingHiddenLayer()
         {
             List<Neuron> HiddenLayer = new List<Neuron>();
