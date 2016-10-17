@@ -9,7 +9,6 @@ namespace hw2ann
 {
     class Backprop
     {
-        static double eta = 0.15;
         static int maxPasses = 2000;
         static double minErrorCondition = .0001;
         static int Passes = 0;
@@ -17,186 +16,179 @@ namespace hw2ann
         public static List<Neuron> HiddenLayer = new List<Neuron>();
         public static Neuron OutputNeuron = new Neuron();
         public static Neuron BiasNeuron = new Neuron();
+        public static List<int> expectedO = new List<int>();
+        public static List<double> actualO = new List<double>();
     
         public static void Main(string[] args)
         {
-            #region Parse 
-            int dataSelector = 3;
-            List<Element> fullData = Parser.parseData(dataSelector);
-            //split into training and testing data
-            List<Element> trainingData = new List<Element>();
-            List<Element> testingData = new List<Element>();
-            List<int> testingInts = new List<int>();
-            Random rnd = new Random();
-            for (int i = 0; i <= 30; i++)
-            {
-                testingInts.Add(rnd.Next(fullData.Count));
-            }
-           
-            for (int j = 0; j < fullData.Count; j++)
-            {
-                if (testingInts.Contains(j))
+            double[] etaArr = { .3, .15, 0.15 };
+
+            for (int y = 1; y <= 3; y++) {
+                double eta = etaArr[y - 1];
+                InputLayer = new List<Neuron>();
+                HiddenLayer = new List<Neuron>();
+                OutputNeuron = new Neuron();
+                BiasNeuron = new Neuron();
+                Passes = 0;
+                #region Parse 
+                int dataSelector = y;
+                List<Element> fullData = Parser.parseData(dataSelector);
+                //split into training and testing data
+                List<Element> trainingData = new List<Element>();
+                List<Element> testingData = new List<Element>();
+                List<int> testingInts = new List<int>();
+                Random rnd = new Random();
+                while (testingInts.Count != 30)
                 {
-                    testingData.Add(fullData[j]);
+                    int test = rnd.Next(fullData.Count);
+                    if(!testingInts.Contains(test))
+                        testingInts.Add(test);
                 }
-                else
+
+                for (int j = 0; j < fullData.Count; j++)
                 {
-                    trainingData.Add(fullData[j]);
+                    if (testingInts.Contains(j))
+                    {
+                        testingData.Add(fullData[j]);
+                    }
+                    else
+                    {
+                        trainingData.Add(fullData[j]);
+                    }
                 }
-            }
 
-            #endregion
-            InputLayer = createInputLayer(dataSelector);
-            HiddenLayer = createHiddenLayer(dataSelector);
-            OutputNeuron = new Neuron();
+                #endregion
+                InputLayer = createInputLayer(dataSelector);
+                HiddenLayer = createHiddenLayer(dataSelector);
+                OutputNeuron = new Neuron();
 
-            #region Create Network
-            for (int i = 0; i < HiddenLayer.Count; i++)     //create network structure
-            {
-                for(int j = 0; j < InputLayer.Count; j++)
+                #region Create Network
+                for (int i = 0; i < HiddenLayer.Count; i++)     //create network structure
                 {
-                    HiddenLayer[i].addInConnection(InputLayer[j]);
+                    for (int j = 0; j < InputLayer.Count; j++)
+                    {
+                        HiddenLayer[i].addInConnection(InputLayer[j]);
+                    }
+                    OutputNeuron.addInConnection(HiddenLayer[i]);
+                    HiddenLayer[i].addBiasConnection(BiasNeuron);
                 }
-                OutputNeuron.addInConnection(HiddenLayer[i]);
-                HiddenLayer[i].addBiasConnection(BiasNeuron);
-            }
-            OutputNeuron.addBiasConnection(BiasNeuron);
-            #endregion
+                OutputNeuron.addBiasConnection(BiasNeuron);
+                #endregion
 
-            double prevErrorSquared = 10.0;
-            double errorSquared = 10.0;
-            while( Passes < maxPasses && errorSquared > .0001)
-            {
-                prevErrorSquared = errorSquared;
-                 errorSquared = 0.0;
-                //set the values of the input neurons based on the attribute values
-                foreach (Element trial in trainingData)
+                double prevErrorSquared = 10.0;
+                double errorSquared = 10.0;
+                while (Passes < maxPasses && errorSquared > .0001)
                 {
-                    setInputNeuronValues(trial, dataSelector);
+                    prevErrorSquared = errorSquared;
+                    errorSquared = 0.0;
+                    //set the values of the input neurons based on the attribute values
+                    foreach (Element trial in trainingData)
+                    {
+                        setInputNeuronValues(trial, dataSelector);
 
+                        //set the hidden layer values based on the weights of connections and the value of the input nodes that go into it.
+                        for (int i = 0; i < HiddenLayer.Count; i++)
+                        {
+                            HiddenLayer[i].calculateOutputValue();
+                        }
+
+                        OutputNeuron.calculateOutputValue();
+
+                        errorSquared += Math.Pow(((double)trial.Label - OutputNeuron.getOutputValue()), 2);
+                        //Console.WriteLine("Training Error = " + ((double)trial.Label - OutputNeuron.getOutputValue()));
+
+                        #region Finding Deltas
+                        //find the deltas       //TODO getBias should always be 1
+                        double deltaWD = OutputNeuron.getOutputValue() * (trial.Label - OutputNeuron.getOutputValue()) * (1 - OutputNeuron.getOutputValue());
+                        OutputNeuron.setDeltaWeight(deltaWD);
+
+                        // find deltas for each hidden neuron
+                        for (int i = 0; i < HiddenLayer.Count; i++)
+                        {
+                            //double deltaWC = HiddenLayer[i].getOutputValue() * (trial.Label - HiddenLayer[i].getOutputValue()) * deltaWD * OutputNeuron.InConnections[i].getWeight();
+                            double deltaWC = HiddenLayer[i].getOutputValue() * (1 - HiddenLayer[i].getOutputValue()) * deltaWD;
+
+                            HiddenLayer[i].setDeltaWeight(deltaWC);
+                        }
+
+                        #endregion
+
+
+                        #region Update Weights
+                        double deltaW = 0.0;
+                        double outputWeight = 0.0;
+                        for (int j = 0; j < OutputNeuron.InConnections.Count; j++)
+                        {
+                            deltaW = OutputNeuron.getDeltaWeight();
+                            outputWeight = OutputNeuron.InConnections[j].getWeight() + (eta * OutputNeuron.InConnections[j].LeftNeuron.getOutputValue() * deltaWD);
+                            OutputNeuron.InConnections[j].setWeight(outputWeight);
+                        }
+
+                        OutputNeuron.BiasConnection.setWeight(OutputNeuron.BiasConnection.getWeight() + (eta * deltaW));
+
+                        for (int k = 0; k < HiddenLayer.Count; k++)
+                        {
+                            for (int l = 0; l < HiddenLayer[k].InConnections.Count; l++)
+                            {
+                                HiddenLayer[k].InConnections[l].setWeight(HiddenLayer[k].InConnections[l].getWeight() + (eta * HiddenLayer[k].InConnections[l].LeftNeuron.getOutputValue() * HiddenLayer[k].getDeltaWeight()));
+                                //Console.Write("w(" + neuronCount + ", " + connectionCount + ") = " + connection.getWeight() + " ");
+                            }
+
+
+                            HiddenLayer[k].BiasConnection.setWeight(HiddenLayer[k].BiasConnection.getWeight() + (eta * HiddenLayer[k].getDeltaWeight()));
+                            //Console.Write("\n ");
+                        }
+                        #endregion
+                    }
+                    //Console.WriteLine("Passes = " + Passes);
+                    //Console.WriteLine("Error squared = " + errorSquared);
+                    //if (errorSquared > prevErrorSquared)
+                    //    Console.WriteLine("error increasing");
+
+                    Passes++;
+
+                    if (Passes == maxPasses)
+                        Console.WriteLine("max passes");
+                    else if (errorSquared < minErrorCondition)
+                        Console.WriteLine("error square good");
+
+                }
+
+                printWeights();
+
+
+                int errors = 0;
+                foreach (Element test in testingData)
+                {
+                    setInputNeuronValues(test, dataSelector);
                     //set the hidden layer values based on the weights of connections and the value of the input nodes that go into it.
                     for (int i = 0; i < HiddenLayer.Count; i++)
                     {
                         HiddenLayer[i].calculateOutputValue();
                     }
 
+
+                    expectedO.Add(test.Label);
                     OutputNeuron.calculateOutputValue();
+                    int expectedLabel = test.Label;
+                    int outputLabel = (OutputNeuron.getOutputValue() > .5) ? 1 : 0;
 
-                    errorSquared += Math.Pow(((double)trial.Label - OutputNeuron.getOutputValue()), 2);
-                    //Console.WriteLine("Training Error = " + ((double)trial.Label - OutputNeuron.getOutputValue()));
-
-                    #region Finding Deltas
-                    //find the deltas       //TODO getBias should always be 1
-                    double deltaWD = OutputNeuron.getOutputValue() * (trial.Label - OutputNeuron.getOutputValue()) * (1 - OutputNeuron.getOutputValue());
-                    OutputNeuron.setDeltaWeight(deltaWD);
-
-                    // find deltas for each hidden neuron
-                    for(int i = 0; i< HiddenLayer.Count; i++)
+                    actualO.Add(OutputNeuron.getOutputValue());
+                    if (expectedLabel != outputLabel)
                     {
-                        //double deltaWC = HiddenLayer[i].getOutputValue() * (trial.Label - HiddenLayer[i].getOutputValue()) * deltaWD * OutputNeuron.InConnections[i].getWeight();
-                        double deltaWC = HiddenLayer[i].getOutputValue() * (1-HiddenLayer[i].getOutputValue())*deltaWD;
-
-                        HiddenLayer[i].setDeltaWeight(deltaWC);
+                        errors++;
                     }
-
-                    #endregion
-
-
-                    #region Update Weights
-                    double deltaW = 0.0;
-                    double outputWeight = 0.0;
-                    for(int j = 0; j < OutputNeuron.InConnections.Count; j++)
-                    {
-                        deltaW = OutputNeuron.getDeltaWeight();
-                        outputWeight = OutputNeuron.InConnections[j].getWeight() + (eta * OutputNeuron.InConnections[j].LeftNeuron.getOutputValue() * deltaWD);
-                        OutputNeuron.InConnections[j].setWeight(outputWeight);
-                    }
-
-                    OutputNeuron.BiasConnection.setWeight(OutputNeuron.BiasConnection.getWeight() + (eta * deltaW));
-
-                    for(int k = 0; k < HiddenLayer.Count; k ++)
-                    {
-                        for(int l = 0; l < HiddenLayer[k].InConnections.Count; l++)
-                        {
-                            HiddenLayer[k].InConnections[l].setWeight(HiddenLayer[k].InConnections[l].getWeight() + (eta * HiddenLayer[k].InConnections[l].LeftNeuron.getOutputValue() * HiddenLayer[k].getDeltaWeight()));
-                            //Console.Write("w(" + neuronCount + ", " + connectionCount + ") = " + connection.getWeight() + " ");
-                        }
-
-
-                        HiddenLayer[k].BiasConnection.setWeight(HiddenLayer[k].BiasConnection.getWeight() + (eta * HiddenLayer[k].getDeltaWeight()));
-                        //Console.Write("\n ");
-                    }
-                    #endregion
-
-
-                    #region error gucci
-                    //errorGucci = true;
-                    //foreach(Connection inConnection in OutputNeuron.InConnections)
-                    //{
-                    //    if(inConnection.DeltaDiff > minErrorCondition)
-                    //    {
-                    //        errorGucci = false;
-                    //        break;
-                    //    }
-                    //}
-
-                    //    if (errorGucci) { 
-                    //        foreach(Neuron n in HiddenLayer)
-                    //        {
-                    //            if (errorGucci)
-                    //            {
-                    //                foreach (Connection c in n.InConnections)
-                    //                {
-                    //                    if (c.DeltaDiff > minErrorCondition)
-                    //                    {
-                    //                        errorGucci = false;
-                    //                        break;
-                    //                    }
-                    //                }
-                    //            }
-                    //        }
-                    //    }
-                    //}
-                    #endregion
                 }
-                //Console.WriteLine("Passes = " + Passes);
-                Console.WriteLine("Error squared = "+ errorSquared);
-                if(errorSquared > prevErrorSquared)
-                    Console.WriteLine("error increasing"); 
-
-                Passes++;
-
-                if (Passes == maxPasses)
-                    Console.WriteLine("max passes");
-                else if (errorSquared < minErrorCondition)
-                    Console.WriteLine("error square good");
+                Console.WriteLine("Errors = " + errors);
 
             }
-
-            printWeights();
-
-
-            int errors = 0;
-            foreach(Element test in testingData)
+            Console.WriteLine("");
+            for(int i = 0;  i < 30; i++)
             {
-                setInputNeuronValues(test, dataSelector);
-                //set the hidden layer values based on the weights of connections and the value of the input nodes that go into it.
-                for (int i = 0; i < HiddenLayer.Count; i++)
-                {
-                    HiddenLayer[i].calculateOutputValue();
-                }
-
-                OutputNeuron.calculateOutputValue();
-                int expectedLabel = test.Label;
-                int outputLabel = (OutputNeuron.getOutputValue() > .5) ? 1 : 0;
-                Console.WriteLine("Actual output = " + OutputNeuron.getOutputValue());
-                if(expectedLabel != outputLabel)
-                {
-                    errors++;
-                }
+                Console.WriteLine((i+1) + " & " + expectedO[i] +" & " + actualO[i] +" & " + expectedO[i+30] + " & " + actualO[i+30] + " & " + expectedO[i+60] + " & " + actualO[i+60] + " \\\\\\hline");
             }
-            Console.WriteLine("Errors = " + errors);
             Console.ReadKey();
+
         }
 
         private static void printWeights()
