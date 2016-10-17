@@ -8,7 +8,7 @@ namespace hw2ann
 {
     class Connection
     {
-        public double Weight = .2;
+        public double Weight = .3;
         public Neuron LeftNeuron;
         public Neuron RightNeuron;
         //private static int counter = 0;

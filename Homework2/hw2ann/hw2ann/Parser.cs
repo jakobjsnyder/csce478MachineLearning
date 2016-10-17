@@ -12,6 +12,44 @@ namespace hw2ann
 {
     class Parser
     {
+        private static List<Element> parseTicTac()
+        {
+            List<Element> fullData = new List<Element>();
+            string line;
+
+            // Read the file and display it line by line.
+            StreamReader file = new StreamReader("tic-tac-toe.data");
+            while ((line = file.ReadLine()) != null)
+            {
+                int clas;
+                List<int> attri = new List<int>();
+                line = line.Trim();
+                var split = line.Split(',');
+                clas = (split.Last().Equals("positive"))?1:0;
+                int i = 0;
+                foreach (string item in split)
+                {
+                    switch (item)
+                    {
+                        case "b":
+                            attri.Add(0);
+                            break;
+                        case "x":
+                            attri.Add(1);
+                            break;
+                        case "o":
+                            attri.Add(2);
+                            break;
+                    }
+                }
+                fullData.Add(new Element(clas, attri));
+            }
+
+            file.Close();
+            return fullData;
+        }
+
+
         private static List<Element> parseMonk()
         {
             List<Element> fullData = new List<Element>();
@@ -135,11 +173,15 @@ namespace hw2ann
                 case 2:
                     return parseVote();
                 case 3:
+                    return parseTicTac();
+                case 4:
                     return parsePoker();
 
             }
             return null;
 
         }
+
+        
     }
 }

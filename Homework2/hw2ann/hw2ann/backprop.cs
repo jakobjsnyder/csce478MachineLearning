@@ -9,11 +9,10 @@ namespace hw2ann
 {
     class Backprop
     {
-        static double eta = 0.2;
-        static int maxPasses = 400000;
+        static double eta = 0.15;
+        static int maxPasses = 2000;
         static double minErrorCondition = .0001;
         static int Passes = 0;
-        static bool errorGucci = false;
         public static List<Neuron> InputLayer = new List<Neuron>();
         public static List<Neuron> HiddenLayer = new List<Neuron>();
         public static Neuron OutputNeuron = new Neuron();
@@ -22,54 +21,33 @@ namespace hw2ann
         public static void Main(string[] args)
         {
             #region Parse 
-            int dataSelector = 1;
+            int dataSelector = 3;
             List<Element> fullData = Parser.parseData(dataSelector);
             //split into training and testing data
             List<Element> trainingData = new List<Element>();
             List<Element> testingData = new List<Element>();
             List<int> testingInts = new List<int>();
-            List<int> pokerTraining = new List<int>();
             Random rnd = new Random();
             for (int i = 0; i <= 30; i++)
             {
                 testingInts.Add(rnd.Next(fullData.Count));
             }
-            if(dataSelector == 3)
+           
+            for (int j = 0; j < fullData.Count; j++)
             {
-                for(int i = 0; i <= 700; i++)
+                if (testingInts.Contains(j))
                 {
-                    pokerTraining.Add(rnd.Next(fullData.Count));
+                    testingData.Add(fullData[j]);
                 }
-                for (int j = 0; j < fullData.Count; j++)
+                else
                 {
-                    if (testingInts.Contains(j))
-                    {
-                        testingData.Add(fullData[j]);
-                    }
-                    else if(pokerTraining.Contains(j))
-                    {
-                        trainingData.Add(fullData[j]);
-                    }
+                    trainingData.Add(fullData[j]);
                 }
             }
-            else
-            {
-                for (int j = 0; j < fullData.Count; j++)
-                {
-                    if (testingInts.Contains(j))
-                    {
-                        testingData.Add(fullData[j]);
-                    }
-                    else
-                    {
-                        trainingData.Add(fullData[j]);
-                    }
-                }
-            }
-            
+
             #endregion
-            InputLayer = createInputLayer(2);
-            HiddenLayer = createHiddenLayer(2);
+            InputLayer = createInputLayer(dataSelector);
+            HiddenLayer = createHiddenLayer(dataSelector);
             OutputNeuron = new Neuron();
 
             #region Create Network
@@ -85,10 +63,11 @@ namespace hw2ann
             OutputNeuron.addBiasConnection(BiasNeuron);
             #endregion
 
-
+            double prevErrorSquared = 10.0;
             double errorSquared = 10.0;
             while( Passes < maxPasses && errorSquared > .0001)
             {
+                prevErrorSquared = errorSquared;
                  errorSquared = 0.0;
                 //set the values of the input neurons based on the attribute values
                 foreach (Element trial in trainingData)
@@ -182,6 +161,9 @@ namespace hw2ann
                 }
                 //Console.WriteLine("Passes = " + Passes);
                 Console.WriteLine("Error squared = "+ errorSquared);
+                if(errorSquared > prevErrorSquared)
+                    Console.WriteLine("error increasing"); 
+
                 Passes++;
 
                 if (Passes == maxPasses)
@@ -197,7 +179,7 @@ namespace hw2ann
             int errors = 0;
             foreach(Element test in testingData)
             {
-                setInputNeuronValues(test, 2);
+                setInputNeuronValues(test, dataSelector);
                 //set the hidden layer values based on the weights of connections and the value of the input nodes that go into it.
                 for (int i = 0; i < HiddenLayer.Count; i++)
                 {
@@ -256,9 +238,35 @@ namespace hw2ann
             }
             else if(dataSelector == 3)
             {
-                setPokerInputNeuronValues(trial);
+                setTicTacInputNeuronValues(trial);
             }
             
+        }
+
+        private static void setTicTacInputNeuronValues(Element trial)
+        {
+            int counter = 0;
+            foreach (int attribute in trial.Attributes)
+            {
+                if (attribute == 0)
+                {
+                    InputLayer[counter].setOutputValue(0);
+                    InputLayer[counter + 1].setOutputValue(0);
+                    counter += 2;
+                }
+                else if (attribute == 1)
+                {
+                    InputLayer[counter].setOutputValue(1);
+                    InputLayer[counter + 1].setOutputValue(0);
+                    counter += 2;
+                }
+                else if (attribute == 2)
+                {
+                    InputLayer[counter].setOutputValue(0);
+                    InputLayer[counter + 1].setOutputValue(1);
+                    counter += 2;
+                }
+            }
         }
 
         private static void setPokerInputNeuronValues(Element trial)
@@ -579,10 +587,21 @@ namespace hw2ann
             }
             else if (dataSelector == 3)
             {
-                return createPokerInputLayer();
+                return createTicTacInputLayer();
             }
             else
                 return null;
+        }
+
+        private static List<Neuron> createTicTacInputLayer()
+        {
+            List<Neuron> InLayer = new List<Neuron>();
+            for (int i = 0; i < 9; i++)
+            {
+                InLayer.Add(new Neuron());
+                InLayer.Add(new Neuron());      //two neurons for every input attribute
+            }
+            return InLayer;
         }
 
         private static List<Neuron> createPokerInputLayer()
@@ -640,16 +659,26 @@ namespace hw2ann
             }
             else if(dataSelector == 3)
             {
-                return createPokerHiddenLayer();
+                return creatTicTacHiddenLayer();
             }
             else
                 return null;
         }
 
+        private static List<Neuron> creatTicTacHiddenLayer()
+        {
+            List<Neuron> InLayer = new List<Neuron>();
+            for (int i = 0; i < 4; i++)
+            {
+                InLayer.Add(new Neuron());
+            }
+            return InLayer;
+        }
+
         private static List<Neuron> createPokerHiddenLayer()
         {
             List<Neuron> InLayer = new List<Neuron>();
-            for(int i = 0; i < 5; i++)
+            for(int i = 0; i < 10; i++)
             {
                 InLayer.Add(new Neuron());
             }
@@ -659,7 +688,6 @@ namespace hw2ann
         private static List<Neuron> createMonkHiddenLayer()
         {
             List<Neuron> inlayer = new List<Neuron>();
-            inlayer.Add(new Neuron());
             inlayer.Add(new Neuron());
             inlayer.Add(new Neuron());
             return inlayer;

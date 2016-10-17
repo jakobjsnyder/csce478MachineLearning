@@ -54,12 +54,14 @@
     <None Include="App.config" />
     <None Include="data\monks.data" />
     <None Include="data\poker.data" />
+    <None Include="data\tic-tac-toe.data" />
     <None Include="data\vote.data" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="data\house-votes-84.names.txt" />
     <Content Include="data\monks.names.txt" />
     <Content Include="data\poker-hand.names.txt" />
+    <Content Include="data\tic-tac-toe.names.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
