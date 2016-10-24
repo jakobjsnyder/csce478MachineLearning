@@ -25,7 +25,6 @@ namespace hw3nb
                 line = line.Trim();
                 var split = line.Split(',');
                 clas = (split.Last().Equals("positive"))?1:0;
-                int i = 0;
                 foreach (string item in split)
                 {
                     switch (item)

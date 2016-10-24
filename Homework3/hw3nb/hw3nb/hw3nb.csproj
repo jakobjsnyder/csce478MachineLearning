@@ -51,14 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="bin\Debug\monks.data" />
-    <None Include="bin\Debug\monks.names" />
-    <None Include="bin\Debug\poker.data" />
-    <None Include="bin\Debug\poker.names" />
-    <None Include="bin\Debug\tic-tac-toe.data" />
-    <None Include="bin\Debug\tic-tac-toe.names" />
-    <None Include="bin\Debug\vote.data" />
-    <None Include="bin\Debug\vote.names" />
     <None Include="data\monks.data" />
     <None Include="data\monks.names" />
     <None Include="data\poker.data" />

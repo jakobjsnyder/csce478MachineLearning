@@ -69,7 +69,6 @@ namespace hw3nb
                     if (contains)
                     {
                         bool containsWithLabel = false;
-                        int containsAt = -1;
                         for (int k = 0; k < complexCounter.Value.Count(); k++)
                         {
                             if(complexCounter.Value[k] == currentAttriValue && complexCounter.Label[k] == currentLabel)
@@ -97,7 +96,7 @@ namespace hw3nb
 
                 }
 
-                for (int l = 0; l < complexCounter.Value.Count())
+                for (int l = 0; l < complexCounter.Value.Count(); l++)
                 {
                     if(complexCounter.Label[l] == 1)//positive
                     {
