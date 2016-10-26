@@ -55,6 +55,10 @@ namespace hw3nb
 
             int numAttributes = trainingData[0].Attributes.Count();
 
+
+
+
+            #region worthless
             List<double> PpAttribute = new List<double>();
             List<double> PnAttribute = new List<double>();
 
@@ -100,14 +104,23 @@ namespace hw3nb
                 {
                     if(complexCounter.Label[l] == 1)//positive
                     {
-                        PpAttribute.Add(complexCounter.Count[l] / totalPositive);
+                        PpAttribute.Add(complexCounter.Count[l] * 1.0 / totalPositive);
                     }
                     else//negative
                     {
-                        PnAttribute.Add(complexCounter.Count[l] / totalNegative);
+                        PnAttribute.Add(complexCounter.Count[l] * 1.0/ totalNegative);
                     }
                 }
+                
             }
+            Console.WriteLine("Positives");
+            foreach (var item in PpAttribute)
+                Console.WriteLine(item);
+            Console.WriteLine("Negatives");
+            foreach (var item in PnAttribute)
+                Console.WriteLine(item);
+            Console.ReadKey();
+            #endregion
         }
     }
 }
