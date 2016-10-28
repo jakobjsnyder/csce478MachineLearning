@@ -29,13 +29,13 @@ namespace hw3nb
                 {
                     switch (item)
                     {
-                        case "b":
+                        case "x":
                             attri.Add(0);
                             break;
-                        case "x":
+                        case "o":
                             attri.Add(1);
                             break;
-                        case "o":
+                        case "b":
                             attri.Add(2);
                             break;
                     }
