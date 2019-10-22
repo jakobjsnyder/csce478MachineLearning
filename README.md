@@ -2,4 +2,4 @@
 Machine Learning
 
 
-SUHHHH THOOOOOOOO
+School Project
